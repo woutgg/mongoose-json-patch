@@ -59,7 +59,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 			for (var len = patches.length, i=0; i<len; ++i) {
 				var patch = patches[i];
 				if(patch.op=='test'){
-					var success = jsonpatch.apply(item, [].concat(patch), true);
+					var success = jsonpatch.apply(this, [].concat(patch), true);
 					if(!success){
 						return callback(new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document'));
 					}
