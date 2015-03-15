@@ -28,7 +28,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 	PATCH LOGIC
 	===========
 	*/
-	
+
 	//Find all attributes that have writable set to false
 	var schemaWriteBlacklist = _.filter(Object.keys(schema.paths), function(pathName) {
 		var path = schema.path(pathName);
@@ -56,6 +56,15 @@ module.exports = exports = function checkPermissions(schema, options) {
 
 		//Apply the patch
 		try {
+			for (var len = patches.length, i=0; i<len; ++i) {
+				var patch = patches[i];
+				if(patch.op=='test'){
+					var success = jsonpatch.apply(item, [].concat(patch), true);
+					if(!success){
+						return callback(new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document'));
+					}
+				}
+			}
 			jsonpatch.apply(this, patches, true);
 		} catch(err) {
 			return callback(err);
@@ -74,7 +83,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 		return '/' + path.split('.').join('/');
 	}
 
-	
+
 
 	/*
 	========================
@@ -92,7 +101,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 	});
 
 	this.readBlacklist = _.union(globalReadBlacklist, schemaReadBlacklist);
-	
+
 	/*
 	 * Takes this object and removes any properties that are marked as {readable: false} in the schema.
 	 * Supplying any additional keys as arguments will remove them.
@@ -121,5 +130,5 @@ module.exports = exports = function checkPermissions(schema, options) {
 		}
 		return collection;
 	}
-	
+
 };
