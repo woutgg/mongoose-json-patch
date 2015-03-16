@@ -56,15 +56,20 @@ module.exports = exports = function checkPermissions(schema, options) {
 
 		//Apply the patch
 		try {
-			for (var len = patches.length, i=0; i<len; ++i) {
+
+			// Make sure all tests pass
+			// This can be removed once JSON-Patch #64 is fixed
+			// https://github.com/Starcounter-Jack/JSON-Patch/issues/64
+			for (var i = 0; i < patches.length; i++) {
 				var patch = patches[i];
-				if(patch.op=='test'){
+				if(patch.op == 'test') {
 					var success = jsonpatch.apply(this, [].concat(patch), true);
-					if(!success){
-						return callback(new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document'));
+					if(!success) {
+						return callback(new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document.'));
 					}
 				}
 			}
+			
 			jsonpatch.apply(this, patches, true);
 		} catch(err) {
 			return callback(err);
