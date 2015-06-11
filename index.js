@@ -23,11 +23,9 @@ module.exports = exports = function checkPermissions(schema, options) {
 
 	var self = this;
 
-	/*
-	===========
-	PATCH LOGIC
-	===========
-	*/
+	// ...................
+	// === PATCH LOGIC ===
+	// ^^^^^^^^^^^^^^^^^^^
 
 	//Find all attributes that have writable set to false
 	var schemaWriteBlacklist = _.filter(Object.keys(schema.paths), function(pathName) {
@@ -58,7 +56,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 		try {
 
 			// Make sure all tests pass
-			// This can be removed once JSON-Patch #64 is fixed
+			// TODO: This can be removed once JSON-Patch #64 is fixed
 			// https://github.com/Starcounter-Jack/JSON-Patch/issues/64
 			for (var i = 0; i < patches.length; i++) {
 				var patch = patches[i];
@@ -88,13 +86,9 @@ module.exports = exports = function checkPermissions(schema, options) {
 		return '/' + path.split('.').join('/');
 	}
 
-
-
-	/*
-	========================
-	PROTECTED PROPERTY LOGIC
-	========================
-	*/
+	// ................................
+	// === PROTECTED PROPERTY LOGIC ===
+	// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	//Find all attributes that have readable set to false
 	var schemaReadBlacklist = _.filter(Object.keys(schema.paths), function(pathName) {
