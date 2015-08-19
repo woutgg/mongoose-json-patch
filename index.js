@@ -30,8 +30,8 @@ module.exports = exports = function checkPermissions(schema, options) {
 	//Find all attributes that have writable set to false
 	var schemaWriteBlacklist = _.filter(Object.keys(schema.paths), function(pathName) {
 		var path = schema.path(pathName);
-		if(path.options && path.options.writable != undefined) {
-			return path.options.writable == false;
+		if(path.options && path.options.writable !== undefined) {
+			return path.options.writable === false;
 		}
 		return false;
 	});
@@ -40,9 +40,10 @@ module.exports = exports = function checkPermissions(schema, options) {
 	this.writeBlacklist = _.union(globalWriteBlacklist, schemaWriteBlacklist);
 
 	schema.method('patch', function(patches, callback) {
+		 var i;
 
 		//Check to make sure none of the paths are on the write blacklist
-		for(var i = 0; i < writeBlacklist.length; i++) {
+		for(i = 0; i < writeBlacklist.length; i++) {
 			var pathName = mpathToJSONPointer(writeBlacklist[i]);
 
 			for(var j = 0; j < patches.length; j++) {
@@ -58,7 +59,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 			// Make sure all tests pass
 			// TODO: This can be removed once JSON-Patch #64 is fixed
 			// https://github.com/Starcounter-Jack/JSON-Patch/issues/64
-			for (var i = 0; i < patches.length; i++) {
+			for (i = 0; i < patches.length; i++) {
 				var patch = patches[i];
 				if(patch.op == 'test') {
 					var success = jsonpatch.apply(this, [].concat(patch), true);
@@ -67,7 +68,19 @@ module.exports = exports = function checkPermissions(schema, options) {
 					}
 				}
 			}
-			
+
+		    // Dirty fix for mongoose-json-patch #3
+		    // https://github.com/winduptoy/mongoose-json-patch/issues/3
+		    for (i = 0; i < patches.length; ) {
+				var p = patches[i];
+				if (p.op === 'remove') {
+			    	_.set(this, p.path.substring(1).replace(/\//g, '.'), undefined);
+			    	_.pullAt(patches, i);
+				} else {
+			    	i++;
+				}
+		    }
+
 			jsonpatch.apply(this, patches, true);
 		} catch(err) {
 			return callback(err);
@@ -93,8 +106,8 @@ module.exports = exports = function checkPermissions(schema, options) {
 	//Find all attributes that have readable set to false
 	var schemaReadBlacklist = _.filter(Object.keys(schema.paths), function(pathName) {
 		var path = schema.path(pathName);
-		if(path.options && path.options.readable != undefined) {
-			return path.options.readable == false;
+		if(path.options && path.options.readable !== undefined) {
+			return path.options.readable === false;
 		}
 		return false;
 	});
@@ -128,6 +141,6 @@ module.exports = exports = function checkPermissions(schema, options) {
 			collection[i] = collection[i].filterProtected.apply(collection[i], args);
 		}
 		return collection;
-	}
+	};
 
 };
