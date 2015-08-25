@@ -21,7 +21,7 @@ var globalWriteBlacklist = ['_id', '__v'];
  */
 module.exports = exports = function checkPermissions(schema, options) {
 
-	var self = this;
+	var self = {};
 
 	// ...................
 	// === PATCH LOGIC ===
@@ -37,13 +37,13 @@ module.exports = exports = function checkPermissions(schema, options) {
 	});
 
 	//Add them to the blacklist
-	this.writeBlacklist = _.union(globalWriteBlacklist, schemaWriteBlacklist);
+	self.writeBlacklist = _.union(globalWriteBlacklist, schemaWriteBlacklist);
 
 	schema.method('patch', function(patches, callback) {
 
 		//Check to make sure none of the paths are on the write blacklist
-		for(var i = 0; i < writeBlacklist.length; i++) {
-			var pathName = mpathToJSONPointer(writeBlacklist[i]);
+		for(var i = 0; i < self.writeBlacklist.length; i++) {
+			var pathName = mpathToJSONPointer(self.writeBlacklist[i]);
 
 			for(var j = 0; j < patches.length; j++) {
 				if(patches[j].path == pathName) {
@@ -99,7 +99,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 		return false;
 	});
 
-	this.readBlacklist = _.union(globalReadBlacklist, schemaReadBlacklist);
+	self.readBlacklist = _.union(globalReadBlacklist, schemaReadBlacklist);
 
 	/*
 	 * Takes this object and removes any properties that are marked as {readable: false} in the schema.
