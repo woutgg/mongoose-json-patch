@@ -43,8 +43,8 @@ module.exports = exports = function checkPermissions(schema, options) {
 		 var i;
 
 		//Check to make sure none of the paths are on the write blacklist
-		for(i = 0; i < writeBlacklist.length; i++) {
-			var pathName = mpathToJSONPointer(writeBlacklist[i]);
+		for(i = 0; i < self.writeBlacklist.length; i++) {
+			var pathName = mpathToJSONPointer(self.writeBlacklist[i]);
 
 			for(var j = 0; j < patches.length; j++) {
 				if(patches[j].path == pathName) {
