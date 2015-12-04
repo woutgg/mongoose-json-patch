@@ -4,6 +4,7 @@
  * Don't patch like an idiot
  * http://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/
  */
+
 var _ = require('lodash'),
   mpath = require('mpath'),
   jsonpatch = require('fast-json-patch');
@@ -73,11 +74,12 @@ module.exports = exports = function checkPermissions(schema, options) {
       // https://github.com/winduptoy/mongoose-json-patch/issues/8
       for (i = 0; i < patches.length;) {
         var p = patches[i];
-        if (p.op === 'remove') {
-          _.set(this, p.path.substring(1).replace(/\//g, '.'), undefined);
+        var value = this.get(jsonPointerToMPath(p.path))
+        if (p.op === 'remove' && value !== Object(value)) {
+          _.set(this, jsonPointerToMPath(p.path), undefined);
           _.pullAt(patches, i);
         } else if (p.op === 'add' && p.value !== Object(p.value)) {
-            this.set(p.path.substring(1).replace(/\//g, '.'), p.value);
+            this.set(jsonPointerToMPath(p.path), p.value);
             _.pullAt(patches, i);
         } else {
           i++;
@@ -100,6 +102,14 @@ module.exports = exports = function checkPermissions(schema, options) {
    */
   function mpathToJSONPointer(path) {
     return '/' + path.split('.').join('/');
+  }
+
+  /*
+   * Basic implementation converter  JSON Pointers (RFC6901) style paths to Mongoose/MongoDB
+   * /user/authLocal/email -> user.authLocal.email
+   */
+  function jsonPointerToMPath(pointer) {
+    return pointer.substring(1).replace(/\//g, '.');
   }
 
   // ................................
