@@ -83,6 +83,7 @@ module.exports = exports = function checkPermissions(schema, options) {
             _.pullAt(patches, i);
         } else if (p.op === 'replace') {
           this.markModified(jsonPointerToMPath(p.path));
+          i++;
         } else {
           i++;
         }
