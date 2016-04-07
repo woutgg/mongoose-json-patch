@@ -81,12 +81,11 @@ module.exports = exports = function checkPermissions(schema, options) {
         } else if (p.op === 'add' && p.value !== Object(p.value)) {
             this.set(jsonPointerToMPath(p.path), p.value);
             _.pullAt(patches, i);
-        } else if (p.op === 'replace') {
-          this.markModified(jsonPointerToMPath(p.path));
-          i++;
         } else {
           i++;
         }
+        
+        this.markModified(jsonPointerToMPath(p.path));
       }
 
       jsonpatch.apply(this, patches, true);
