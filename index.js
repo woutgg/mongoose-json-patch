@@ -90,7 +90,7 @@ module.exports = exports = function checkPermissions(schema, options) {
         this.markModified(jsonPointerToMPath(p.path));
       }
 
-      jsonpatch.apply(this, patches, true);
+      jsonpatch.applyPatch(this, patches, true);
     } catch (err) {
 			return callback ? callback(err) : Promise.reject(err);
     }
