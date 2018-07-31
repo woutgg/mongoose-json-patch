@@ -48,7 +48,8 @@ module.exports = exports = function checkPermissions(schema, options) {
 
       for (var j = 0; j < patches.length; j++) {
         if (patches[j].path == pathName) {
-          return callback(new Error('Modifying ' + pathName + ' is not allowed.'));
+					var err = new Error('Modifying ' + pathName + ' is not allowed.');
+					return callback ? callback(err) : Promise.reject(err);
         }
       }
     }
@@ -64,7 +65,8 @@ module.exports = exports = function checkPermissions(schema, options) {
         if (patch.op == 'test') {
           var success = jsonpatch.apply(this, [].concat(patch), true);
           if (!success) {
-            return callback(new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document.'));
+						var err = new Error('The json-patch test op at index [' + i + '] has failed. No changes have been applied to the document.');
+						return callback ? callback(err) : Promise.reject(err);
           }
         }
       }
@@ -90,7 +92,7 @@ module.exports = exports = function checkPermissions(schema, options) {
 
       jsonpatch.apply(this, patches, true);
     } catch (err) {
-      return callback(err);
+			return callback ? callback(err) : Promise.reject(err);
     }
 
     //Save the document (or parent document if this happens to be a subdocument)
